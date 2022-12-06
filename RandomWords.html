@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ReactJS Random Words Application</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <style>
+
+    /* 
+    
+      We'll use the same grid-container and grid-item classes we have previously
+      to nicely display random words. 
+
+    */
+    .grid-container {
+      display: grid;
+      grid-gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));;
+      background-color: #2196F3;
+      padding: 10px;
+    }
+
+    .grid-item {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+    }
+    
+    /*
+       Make the font size of spans and inputs larger
+    */
+    span, input
+    {
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="container"></div>
+
+
+  <script type="text/babel">
+  
+  // responsible for displaying a word, given via a prop value
+  class Word extends React.Component 
+  {
+    render() 
+    { 
+      return (<div className="grid-item">
+                {this.props.word}
+              </div>)
+    }
+  };
+
+  // displays random words based on the number of words to display contained
+  // in an input, with the words themselves given via a prop value
+  class RandomWords extends React.Component {
+
+    constructor(props) {
+      super(props);
+
+      // num_words will be the number of words to randomly generate, it is 
+      // bound to the input
+      //
+      // random_words will contain the random_words themselves
+      //
+      this.state =
+        {
+          num_words: 1,
+          random_words: []
+        };
+    }
+    
+    // keeps the num_words state bound to the input text box contents
+    changeNumWords(event)
+    {
+      this.setState({num_words: event.target.value})
+    }
+    
+    // randomly "generates" the words based on the num_words to generate 
+    // and the dictionary of words provided
+    makeWords()
+    {
+      let max = this.props.dictionary.length; 
+      let words = [];
+      let total = this.state.num_words;
+
+      for (let i = 0; i < total; i++)
+      {
+        let word_index = Math.floor(Math.random() * max);
+        words[i] = {
+					key: i,
+                   text: this.props.dictionary[word_index]};
+      }
+
+      this.setState( {random_words: words} );
+    }
+    
+    // displays a word, used in the map inside render
+    showWord(word)
+    {
+      return <Word key={word.key} word={word.text}></Word>
+    }
+
+    render() {
+      
+      // we use conditional rendering with displayRandom...
+
+      // if random_words has not yet been set, we'll display this default text
+      let displayRandom = <h2>Click button above to generate words!</h2>;
+      
+      // if random_words has been set (which will happen when makeWords is 
+      // called after the user clicks submit), then display the random words
+      // that were generated
+      if (this.state.random_words.length > 0)
+      {
+        displayRandom = (
+          <div>
+            <h2>Random Word List...</h2>
+            <div className="grid-container">
+              {this.state.random_words.map(this.showWord)}
+            </div>
+          </div>
+        );
+      }
+      
+      // display the interface... we setup the input textbox to be bound to the 
+      // state key num_words, we call makeWords when the button is clicked, and
+      // we display displayRandom which is determined conditionally above
+      return (
+        <div>
+          <h1>Random Words</h1>
+          <span>Number of Random Words: </span>
+          <input type="text" 
+                 value={this.state.num_words} 
+                 onChange={this.changeNumWords.bind(this)} />
+          <br /> <br />
+          <input type="button" 
+                 onClick={this.makeWords.bind(this)}
+                 value="Generate Random Words" />
+          <br />
+          {displayRandom}
+        </div>
+      );
+    }
+  };
+  
+  // dictionary is provided to RandomWords as a prop with an array of strings
+  ReactDOM.render(
+    <RandomWords dictionary={["Apple", "Banana", "Blackberry", "Blueberry", 
+                              "Cherry", "Grapes", "Kiwi", "Lemon",
+                              "Mango", "Orange", "Pear", "Pineapple",
+                              "Raspberries", "Strawberries", "Tangerine",
+                              "Watermelon", "Hamilton", "Toronto", 
+                              "Calgary", "Edmonton", "Ottawa", "Montreal",
+                              "Vancouver", "London", "Paris", "New York",
+                              "Winnipeg", "Waterloo", "Tokyo", "Canada",
+                              "Snow", "Sun", "Stars", "Ice", "Clouds", 
+                              "Dog", "Cat", "Elephant", "Bear", "Tiger", 
+                              "Bird", "Lion", "Pizza", "Mohawk", "Shovel",
+                              "Brick", "Wood", "Plastic", "Gold", "Silver",
+                              "Google", "Amazon", "Apple", "Microsoft",
+                              "Netflix", "Metal", "Country", "Rap", "Rock",
+                              "Dance", "Play", "Canada", "India", "China",
+                              "Japan", "Russia", "France", "Italy", 
+                              "Germany", "Iran", "Australia"] } />,
+    document.querySelector("#container")
+  );
+
+  </script>
+</body>
+
+</html>
